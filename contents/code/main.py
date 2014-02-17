@@ -233,7 +233,6 @@ class UBlogApplet(plasmascript.Applet):
         self.tweets_widget.prepareGeometryChange()
         if resp['status'] == '200':
             # we must clear all tweets widgets before
-            # FIXME: after delete widgets everthing fucks, please help me on this issue
             for i in xrange(0, self.tweets_layout.count()-1):
                 widget = self.tweets_layout.itemAt(1)
                 if isinstance(widget, TweetWidget):
