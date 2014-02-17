@@ -87,11 +87,6 @@ class TweetWidget(Plasma.Frame):
         self.nam = QNetworkAccessManager()
         self.connect(self.nam, SIGNAL('finished(QNetworkReply*)'), self.set_image)
 
-    def __del__(self):
-        print "deleted"
-
-    def __str__(self):
-        print str(self.message_id) + self.author.text()
 
     def set_image(self, image):
         img = QImage()
@@ -190,7 +185,6 @@ class TweetWidget(Plasma.Frame):
         self.text.setText("<p>%s</p>" % data['text'])
         self._from.setText(self.time_ago(dt))
         if user is True:
-            print "user = true"
             self.is_favorite = data['favorited']
             self.favorite_button.setDown(self.is_favorite)
             self.favorite_button.setVisible(True)
