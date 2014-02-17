@@ -217,6 +217,7 @@ class UBlogApplet(plasmascript.Applet):
         self.timer.start(int(self.history_refresh) * 60 * 1000)
 
     def update(self):
+        self.flash.flash(self.trUtf8("Refreshing timeline..."))
         current_idx = self.tab_bar.currentIndex()
         if current_idx == 0:
             self.__update_timeline()
@@ -226,7 +227,6 @@ class UBlogApplet(plasmascript.Applet):
             self.__update_messages()
 
     def __make_rest_calls(self, url, user=True):
-        self.setBusy(True)
         token = oauth.Token(self.oauth_key, self.oauth_secret)
         client = oauth.Client(self.consumer, token=token)
         resp, content = client.request(url+"?count="+str(self.history_size))
@@ -249,7 +249,6 @@ class UBlogApplet(plasmascript.Applet):
                 self.connect(widget, SIGNAL('favorite(QString, bool)'), self.favorite)
                 self.tweets_layout.addItem(widget)
             self.layout()
-        self.setBusy(False)
 
     def __update_timeline(self):
         self.__make_rest_calls("https://api.twitter.com/1.1/statuses/home_timeline.json")
@@ -279,10 +278,15 @@ class UBlogApplet(plasmascript.Applet):
         self.timer.start()
 
     def retweet(self, message_id):
+        self.flash.flash(self.trUtf8("Retweetting..."))
         self.__make_post_calls("https://api.twitter.com/1.1/statuses/retweet/"+str(message_id)+".json",
                                body='id='+str(message_id))
 
     def favorite(self, message_id, add):
+        if add:            
+            self.flash.flash(self.trUtf8("Adding favorites..."))
+        else:
+            self.flash.flash(self.trUtf8("Removing from favorites..."))
         self.__make_post_calls("https://api.twitter.com/1.1/favorites/"+("create" if add else "destroy")+".json",
                                body='id='+str(message_id))
 
