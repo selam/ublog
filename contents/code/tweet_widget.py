@@ -24,7 +24,9 @@ from PyQt4.QtNetwork import QNetworkAccessManager, QNetworkRequest
 from datetime import datetime
 from dateutil import parser
 import pytz
+import re
 
+r = re.compile(r"((http|https)://[^\s<>'\"]+[^!,\.\s<>'\"\]])")
 
 class TweetWidget(Plasma.Frame):
 
@@ -181,8 +183,8 @@ class TweetWidget(Plasma.Frame):
         self.message_id = data['id']
         self.author.setText(user_['screen_name'])
         dt = parser.parse(data['created_at'])
-
-        self.text.setText("<p>%s</p>" % data['text'])
+        text = r.sub(r'<a href="\1">\1</a>', data['text'])
+        self.text.setText("<p>%s</p>" % text)
         self._from.setText(self.time_ago(dt))
         if user is True:
             self.is_favorite = data['favorited']
