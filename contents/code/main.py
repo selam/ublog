@@ -237,6 +237,7 @@ class UBlogApplet(plasmascript.Applet):
             for i in xrange(0, self.tweets_layout.count()-1):
                 widget = self.tweets_layout.itemAt(1)
                 if isinstance(widget, TweetWidget):
+                    widget.deleteLater()
                     self.tweets_layout.removeAt(1)
             tweets = json.loads(content)
             for tweet in tweets:
