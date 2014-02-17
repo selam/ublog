@@ -324,12 +324,6 @@ class UBlogApplet(plasmascript.Applet):
         else:
             return self.applet.eventFilter(obj, event)
 
-
-
-
-    def theme_changed(self):
-        pass
-
     def authenticate(self, loop_count):
         if loop_count >= 5:
             return self.quit()
