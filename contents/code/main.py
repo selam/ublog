@@ -266,7 +266,6 @@ class UBlogApplet(plasmascript.Applet):
         KToolInvocation.invokeBrowser("https://twitter.com/%s" % (user,))
 
     def __make_post_calls(self, url, body):
-        self.setBusy(True)
         self.timer.stop()
         token = oauth.Token(self.oauth_key, self.oauth_secret)
         client = oauth.Client(self.consumer, token=token)
@@ -275,7 +274,7 @@ class UBlogApplet(plasmascript.Applet):
         if resp['status'] == '200':
             self.update()
         self.timer.start()
-
+	
     def retweet(self, message_id):
         self.flash.flash(self.trUtf8("Retweetting..."))
         self.__make_post_calls("https://api.twitter.com/1.1/statuses/retweet/"+str(message_id)+".json",
@@ -290,7 +289,8 @@ class UBlogApplet(plasmascript.Applet):
                                body='id='+str(message_id))
 
     def update_status(self):
-        tweet = str(self.status_edit.nativeWidget().toPlainText())
+        tweet = unicode(self.status_edit.nativeWidget().toPlainText())
+        self.status_edit.setText(' ')
         self.flash.flash(self.trUtf8("Tweet sending..."))
         self.setBusy(True)
         body = 'status='+tweet
@@ -299,7 +299,7 @@ class UBlogApplet(plasmascript.Applet):
         self.message_id = None
         self.__make_post_calls("https://api.twitter.com/1.1/statuses/update.json",
                                body=body)
-        self.status_edit.setText(' ')
+	self.setBusy(False)
 
     def eventFilter(self, obj, event):
         if isinstance(obj, KTextEdit):
