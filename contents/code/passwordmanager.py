@@ -23,14 +23,15 @@ class PasswordManager(object):
 
     FOLDER_NAME = "ublog"
 
-    def __init__(self):
+    def __init__(self, window_id=0):
         self.wallet = None
+	self.window_id = window_id
 
     def __open_wallet(self):
         if self.wallet is not None:
             return True
 
-        self.wallet = KWallet.Wallet.openWallet(KWallet.Wallet.NetworkWallet(), 0)
+        self.wallet = KWallet.Wallet.openWallet(KWallet.Wallet.NetworkWallet(), self.window_id)
 
         if self.wallet:
             if not self.wallet.setFolder(PasswordManager.FOLDER_NAME):

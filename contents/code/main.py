@@ -58,7 +58,7 @@ class UBlogApplet(plasmascript.Applet):
         self.scroll_widget = None
         self.tweets_layout = None
         self.main_frame = None
-        self.pm = PasswordManager()
+        self.pm = None
         self.consumer = oauth.Consumer(CONSUMER_KEY, CONSUMER_SECRET)
         self.client = oauth.Client(self.consumer)
         self.icon = None
@@ -69,6 +69,7 @@ class UBlogApplet(plasmascript.Applet):
         self.history_refresh = 1
         self.tweets_widget = None
         self.message_id = None
+        self._wallet_timer = QTimer(self)
 
     def init(self):
         """
@@ -156,7 +157,14 @@ class UBlogApplet(plasmascript.Applet):
         self.connect(self.status_edit, SIGNAL('textChanged()'), self.edit_text_changed)
         self.check_config()
 
-    def check_config(self):
+    def check_config(self):       
+        if self.pm is None:
+            self._wallet_timer.setSingleShot(True)
+            self._wallet_timer.setInterval(1000)            
+            self.connect(self._wallet_timer, SIGNAL("timeout()"), self.open_wallet);
+            self._wallet_timer.start()
+            return None
+        
         self.oauth_secret = unicode(self.pm.readPassword("twitter_secret")[1])
         self.oauth_key = unicode(self.pm.readPassword("twitter_token")[1])
         self.history_size = int(self.pm.readEntry("historySize")[1])
@@ -175,6 +183,18 @@ class UBlogApplet(plasmascript.Applet):
             self.connect(self.timer, SIGNAL('timeout()'), self.update)
             self.update()
             self.timer.start(self.history_refresh * 60 * 1000)
+
+    def open_wallet(self):
+        if self.view() is None:
+            self._wallet_timer.start()
+            return None
+        if self.view().winId() is None:
+            self._wallet_timer.start()
+            return None
+        
+        self.pm = PasswordManager(self.view().winId())
+        self.check_config()
+        
 
     def edit_text_changed(self):
         remaining_char = 140 - self.status_edit.nativeWidget().toPlainText().length()
@@ -359,5 +379,6 @@ class UBlogApplet(plasmascript.Applet):
     def quit(self):
         self.close()
 
-def CreateApplet(parent):
+def CreateApplet(parent):    
     return UBlogApplet(parent)
+    
